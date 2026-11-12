@@ -30,9 +30,19 @@ def r1_repeated_withdrawals(tx, ctx):
     Сравните события Withdrawal в атаке и в выплате, уточните условие,
     запустите make run и сравните FP и precision до и после.
     """
+
     withdrawals = [e for e in tx.events if e.name == 'Withdrawal']
+    
     if len(withdrawals) >= 2:
-        return f'{len(withdrawals)} событий Withdrawal в одной транзакции'
+        recipients = {}
+        for w in withdrawals:
+            to = w.args['to']
+            recipients[to] = recipients.get(to, 0) + 1
+            
+        for to, count in recipients.items():
+            if count >= 2:
+                return f'{count} выводов на {to} в одной транзакции'
+                
     return None
 
 
@@ -51,6 +61,19 @@ def r3_operator_takeover(tx, ctx):
     оператора сменил не владелец (e.args['by'] != ctx.owner)
     или новый оператор (e.args['newOperator']) не входит в ctx.allowlist.
     """
+    for e in tx.events:
+        if e.name == 'OperatorChanged':
+            changer = e.args['by']
+            new_operator = e.args['newOperator']
+            
+            # Проверяем, что меняет именно владелец контракта
+            if changer != ctx.owner:
+                return f"Смена оператора не владельцем: {changer}"
+                
+            # Проверяем, что новый оператор есть в белом списке
+            if new_operator not in ctx.allowlist:
+                return f"Новый оператор вне белого списка: {new_operator}"
+                
     return None
 
 

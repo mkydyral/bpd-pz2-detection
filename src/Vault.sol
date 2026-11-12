@@ -46,14 +46,16 @@ contract Vault is Ownable, Pausable {
     function withdrawAll() external whenNotPaused {
         uint256 amount = balanceOf[msg.sender];
         require(amount > 0, "nothing to withdraw");
-        _send(msg.sender, amount);
-        emit Withdrawal(msg.sender, msg.sender, amount);
+        
         balanceOf[msg.sender] = 0;
+        emit Withdrawal(msg.sender, msg.sender, amount);
+        
+        _send(msg.sender, amount);
     }
 
     /// @notice Сменить оператора.
     /// Уязвимость 2: нет проверки onlyOwner - оператором может назначить себя кто угодно.
-    function setOperator(address newOperator) external {
+    function setOperator(address newOperator) external onlyOwner { // <-- ДОБАВЛЕН onlyOwner
         emit OperatorChanged(operator, newOperator, msg.sender);
         operator = newOperator;
     }
