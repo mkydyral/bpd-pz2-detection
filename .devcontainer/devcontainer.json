@@ -1,0 +1,11 @@
+{
+  "name": "BPD 2024 - ПЗ2 (anvil, web3)",
+  "image": "mcr.microsoft.com/devcontainers/base:bookworm",
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "hostRequirements": { "cpus": 2 },
+  "customizations": {
+    "vscode": {
+      "extensions": ["NomicFoundation.hardhat-solidity", "ms-python.python"]
+    }
+  }
+}
